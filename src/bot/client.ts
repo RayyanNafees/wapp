@@ -6,7 +6,8 @@ import emojis, { isEmoji } from "./emojis.js";
 
 // Require database
 
-if (! process.env.CHROMIUM_URL) throw 'Process Env is not parse'
+if (! process.env.CHROMIUM_URL) {throw 'Process Env is not parse'} 
+console.log('Chromium URL', process.env.CHROMIUM_URL)
 
 // Create a new client instance
 const client = new Client({
