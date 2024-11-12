@@ -1,13 +1,10 @@
 import wweb, { Client } from "whatsapp-web.js";
-
+import chromium from 'chromium'
 import qrcode from "qrcode-terminal";
 import respond, { getEmoji } from "./groq.js";
 import emojis, { isEmoji } from "./emojis.js";
 
 // Require database
-
-if (! process.env.CHROMIUM_URL) {throw 'Process Env is not parse'} 
-console.log('Chromium URL', process.env.CHROMIUM_URL)
 
 // Create a new client instance
 const client = new Client({
@@ -15,6 +12,7 @@ const client = new Client({
 		args: ["--no-sandbox", "--disable-setuid-sandbox"],
 		browserURL: process.env.CHROMIUM_URL,
 		timeout: 160 * 1000,
+		exec
 	},
 	authStrategy: new wweb.LocalAuth({
 		clientId: "session",
