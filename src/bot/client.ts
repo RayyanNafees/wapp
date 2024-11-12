@@ -12,7 +12,7 @@ const client = new Client({
 		args: ["--no-sandbox", "--disable-setuid-sandbox"],
 		browserURL: process.env.CHROMIUM_URL,
 		timeout: 160 * 1000,
-		exec
+		// executablePath: chromium.path
 	},
 	authStrategy: new wweb.LocalAuth({
 		clientId: "session",
