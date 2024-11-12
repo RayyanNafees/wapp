@@ -1,0 +1,24 @@
+{
+  "name": "loverbot",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx  watch --env-file=.env  src/index.ts",
+    "format": " biome format ./src/**/*.ts --fix"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.689.0",
+    "@hono/node-server": "^1.13.6",
+    "groq-sdk": "^0.7.0",
+    "hono": "^4.6.9",
+    "pocketbase": "^0.21.5",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0",
+    "wwebjs-aws-s3": "^1.0.2"
+  },
+  "devDependencies": {
+    "@aws-sdk/types": "^3.686.0",
+    "@types/node": "^20.11.17",
+    "@types/qrcode-terminal": "^0.12.2",
+    "tsx": "^4.7.1"
+  }
+}
