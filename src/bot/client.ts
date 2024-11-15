@@ -1,18 +1,21 @@
 import wweb, { Client } from "whatsapp-web.js";
-import chromium from 'chromium'
 import qrcode from "qrcode-terminal";
-import respond, { getEmoji } from "./groq.js";
-import emojis, { isEmoji } from "./emojis.js";
-
+import respond, {
+	generateIslamicQuote,
+	getEmoji,
+	transcription,
+} from "./groq.js";
+import emojis from "./emojis.js";
+import chromium from "chromium";
 // Require database
 
 // Create a new client instance
 const client = new Client({
 	puppeteer: {
 		args: ["--no-sandbox", "--disable-setuid-sandbox"],
-		browserURL: process.env.CHROMIUM_URL,
+		// browserURL: process.env.CHROMIUM_URL,
 		timeout: 160 * 1000,
-		// executablePath: chromium.path
+		executablePath: chromium.path,
 	},
 	authStrategy: new wweb.LocalAuth({
 		clientId: "session",
@@ -23,6 +26,18 @@ const client = new Client({
 // When the client is ready, run this code (only once)
 client.once("ready", () => {
 	console.log("Client is ready!");
+	// setInterval(() => {
+	// 	generateIslamicQuote()
+	// 		.then((quote) => {
+	// 			console.log("quote: ", quote);
+	// 			client.sendMessage(
+	// 				"917990751399@c.us",
+	// 				quote || "Unable to generate Quote",
+	// 			);
+	// 		})
+	// 		.catch(console.log)
+	// 		.finally(() => console.log("ran"));
+	// }, 60 * 1000);
 });
 
 // When the client received QR-Code
@@ -41,36 +56,35 @@ client.on("qr", (qr) => {
 // ); // every 10 mins
 
 client.on("message_create", (message) => {
+	console.log(message.type);
 	if (message.type === "chat") {
 		// Mary zub
-		if (message.from === "919760599498@c.us") {
-			const msgText = message.body.trim().toLowerCase();
-			// if (!sentLoveYou && message.body !== "I hate you idiot!") {
-			// 	message.reply("I love you!");
-			// } else sentLoveYou = true;
+		
+	}
 
-			if (msgText.includes("lol")) message.react("😂");
+	if (message.type === "ptt") {
+		// console.log("Body: ", message.body);
+		// console.log("Raw: ", message.rawData);
 
-			for (const e in emojis) {
-				if (msgText.startsWith(e)) message.react(emojis[e]);
-			}
-
-			const first = msgText.at(0);
-			if (first && isEmoji(first)) {
-				console.log(first);
-				getEmoji(first as string).then((e) => {
-					console.log(e);
-
-					if (isEmoji(String(e))) message.react(String(e));
-				});
-			}
-
-			if (msgText.startsWith("jaan")) {
-				respond(message.body.trim().substring(4)).then((response) =>
-					message.reply(String(response)),
+		if (message.fromMe)
+			message.downloadMedia().then(async (buff) => {
+				console.log(
+					"Downloaded File: ",
+					buff.mimetype,
+					buff.filesize,
+					buff.filename,
+					": \n",
+					// buff.data,
 				);
-			}
-		}
+				if (buff.filesize && buff.filesize < 25000000)
+					transcription(buff.data)
+						.then((r) => {
+							console.log('To:', message.to)
+							console.log('Audio: ', r.text)
+							client.sendMessage(message.to, r.text)
+						})
+						.catch(console.error);
+			});
 	}
 	// if (message.body === '!ping') {
 	// 	// reply back "pong" directly to the message
@@ -83,11 +97,10 @@ client.on("message_create", (message) => {
 	// else {
 	// }
 	// message.getContact().then(c=> console.log("promise", c.id, c.number, c.name,))
-	console.log("author:", message.author);
-	console.log("message.id.remote:", message.id.remote);
-	console.log("from:", message.from);
-	console.log("to:", message.to);
-	console.log(message.type);
+	// console.log("author:", message.author);
+	// console.log("message.id.remote:", message.id.remote);
+	// console.log("from:", message.from);
+	// console.log("to:", message.to);
 });
 
 client.on("remote_session_saved", () => {
@@ -102,5 +115,8 @@ client.on("auth_failure", (message) =>
 client.on("authenticated", (message) =>
 	console.log("Client Authenticated", message),
 );
+
+// client.setStatus()
+
 // Start your client
 export default client;
